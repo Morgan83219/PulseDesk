@@ -1,0 +1,169 @@
+{% extends "layout.html" %}
+{% block title %}Ticket System{% endblock %}
+
+{% block content %}
+<!-- Top bar -->
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: Arial, sans-serif;
+    }
+    .topbar {
+      background-color: #333;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-weight: bold;
+      font-size: 1.5rem;
+      color: white;
+      user-select: none;
+    }
+    .username-dropdown {
+      position: relative;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      min-width: 120px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      z-index: 1000;
+    }
+    .dropdown-content a {
+      color: black;
+      padding: 8px 12px;
+      text-decoration: none;
+      display: block;
+    }
+    .dropdown-content a:hover {
+      background-color: #ddd;
+    }
+    .username-dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .page-heading {
+      text-align: center;
+      margin: 40px 0 20px 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #333;
+    }
+    .box-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 30px;
+      max-width: 900px;
+      margin: 0 auto 60px auto;
+    }
+    .box {
+      background-color: white;
+      border: 2px solid black;
+      box-shadow: 2px 2px 6px grey;
+      width: 220px;
+      height: 140px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #333;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background-color 0.3s, box-shadow 0.3s;
+      user-select: none;
+      text-align: center;
+      text-decoration: none;
+    }
+    .box:hover {
+      background-color: #007bff;
+      color: white;
+      box-shadow: 3px 3px 10px rgba(0, 123, 255, 0.6);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="logo">Collins Aerospace</div>
+    <div class="username-dropdown">
+      {{ username }}
+      <div class="dropdown-content">
+        <a href="{{ url_for('main.logout') }}">Logout</a>
+      </div>
+    </div>
+  </div>
+
+<div class="container py-4">
+  <h1 class="fw-bold mb-3">PulseDesk</h1>
+
+  <!-- Filter Form -->
+  <form method="get" class="row g-2 mb-4">
+    <div class="col-auto">
+      <input type="number" name="ticket_id" class="form-control" placeholder="Ticket ID" value="{{ filter_values.ticket_id }}">
+    </div>
+    <div class="col-auto">
+      <input type="text" name="caller" class="form-control" placeholder="Caller" value="{{ filter_values.caller }}">
+    </div>
+    <div class="col-auto">
+      <select name="state" class="form-select">
+        <option value="">All States</option>
+        {% for s in states %}
+          <option value="{{ s }}" {% if filter_values.state == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto">
+      <select name="severity" class="form-select">
+        <option value="">All Severities</option>
+        {% for sev in severities %}
+          <option value="{{ sev }}" {% if filter_values.severity == sev %}selected{% endif %}>{{ sev }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary">Apply Filters</button>
+    </div>
+    <div class="col-auto">
+      <a href="{{ url_for('main.ticket_system') }}" class="btn btn-secondary">Clear Filters</a>
+    </div>
+  </form>
+
+  {% if tickets %}
+    <table class="table table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th><th>Caller</th><th>Asset ID</th><th>Urgency</th><th>Severity</th><th>State</th><th>Created</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ticket in tickets %}
+        <tr>
+          <td>{{ ticket.id }}</td>
+          <td>{{ ticket.caller }}</td>
+          <td>{{ ticket.asset_id }}</td>
+          <td>{{ ticket.urgency }}</td>
+          <td>{{ ticket.severity }}</td>
+          <td>{{ ticket.state }}</td>
+          <td>{{ ticket.date_created.strftime('%Y-%m-%d') }}</td>
+          <td>
+            <a href="{{ url_for('main.ticket_detail', ticket_id=ticket.id) }}" class="btn btn-sm btn-primary">View</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No tickets match the filters.</p>
+  {% endif %}
+
+  <a href="{{ url_for('main.home') }}" class="btn btn-secondary mt-4">Go Back to Homepage</a>
+</div>
+{% endblock %}

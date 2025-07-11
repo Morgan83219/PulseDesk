@@ -1,0 +1,137 @@
+{% block content %}
+<head>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+
+ <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: Arial, sans-serif;
+    }
+    .topbar {
+      background-color: #333;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-weight: bold;
+      font-size: 1.5rem;
+      color: white;
+      user-select: none;
+    }
+    .username-dropdown {
+      position: relative;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      min-width: 120px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      z-index: 1000;
+    }
+    .dropdown-content a {
+      color: black;
+      padding: 8px 12px;
+      text-decoration: none;
+      display: block;
+    }
+    .dropdown-content a:hover {
+      background-color: #ddd;
+    }
+    .username-dropdown:hover .dropdown-content {
+      display: block;
+    }
+</style>
+<body>
+  <div class="topbar">
+    <div class="logo">Collins Aerospace</div>
+    <div class="username-dropdown">
+      {{ username }}
+      <div class="dropdown-content">
+        <a href="{{ url_for('main.logout') }}">Logout</a>
+      </div>
+    </div>
+  </div>
+<div class="container mt-4">
+  <h2>User Management</h2>
+  <table class="table table-bordered table-hover mt-3">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Current Role</th>
+        <th>Change Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+        <tr>
+          <td>{{ user.username }}</td>
+          <td>{{ user.role }}</td>
+          <td>
+	    <form method="POST" id="form-{{ user.id }}" action="{{ url_for('main.user_management') }}">
+              {{ forms[user.id].hidden_tag() }}
+              {{ forms[user.id].role(class="form-select d-inline w-auto") }}
+              <button type="button" class="btn btn-sm btn-primary"
+          	      data-bs-toggle="modal" data-bs-target="#confirmModal-{{ user.id }}">
+    		Update Role
+  	      </button>
+	    </form>
+
+            <!-- Confirmation Modal -->
+            <div class="modal fade" id="confirmModal-{{ user.id }}" tabindex="-1" aria-labelledby="modalLabel-{{ user.id }}" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel-{{ user.id }}">Confirm Role Change</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Are you sure you want to change <strong>{{ user.username }}</strong>'s role to <span id="selected-role-{{ user.id }}"></span>?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitRoleForm({{ user.id }})">Yes, Change</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="{{ url_for('main.home') }}" class="btn btn-secondary">Back to Home</a>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  function submitRoleForm(userId) {
+    const form = document.getElementById(`form-${userId}`);
+    if (!form) {
+      console.error("Form not found for user ID:", userId);
+      return;
+    }
+    console.log("Submitting form for user ID:", userId);
+    form.submit();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('show.bs.modal', event => {
+        const userId = modal.id.split('-')[1];
+        const select = document.querySelector(`#form-${userId} select[name="role"]`);
+        const span = document.getElementById(`selected-role-${userId}`);
+        if (select && span) span.textContent = select.options[select.selectedIndex].text;
+      });
+    });
+  });
+</script>
+{% endblock %}

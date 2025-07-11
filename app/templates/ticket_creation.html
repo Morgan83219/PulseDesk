@@ -1,0 +1,217 @@
+{% extends "layout.html" %}
+{% block title %}Create Ticket{% endblock %}
+
+{% block content %}
+<!-- Top black bar -->
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: Arial, sans-serif;
+    }
+    .topbar {
+      background-color: #333;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-weight: bold;
+      font-size: 1.5rem;
+      color: white;
+      user-select: none;
+    }
+    .username-dropdown {
+      position: relative;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      min-width: 120px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      z-index: 1000;
+    }
+    .dropdown-content a {
+      color: black;
+      padding: 8px 12px;
+      text-decoration: none;
+      display: block;
+    }
+    .dropdown-content a:hover {
+      background-color: #ddd;
+    }
+    .username-dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .page-heading {
+      text-align: center;
+      margin: 40px 0 20px 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #333;
+    }
+    .box-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 30px;
+      max-width: 900px;
+      margin: 0 auto 60px auto;
+    }
+    .box {
+      background-color: white;
+      border: 2px solid black;
+      box-shadow: 2px 2px 6px grey;
+      width: 220px;
+      height: 140px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #333;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background-color 0.3s, box-shadow 0.3s;
+      user-select: none;
+      text-align: center;
+      text-decoration: none;
+    }
+    .box:hover {
+      background-color: #007bff;
+      color: white;
+      box-shadow: 3px 3px 10px rgba(0, 123, 255, 0.6);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="logo">Collins Aerospace</div>
+    <div class="username-dropdown">
+      {{ username }}
+      <div class="dropdown-content">
+        <a href="{{ url_for('main.logout') }}">Logout</a>
+      </div>
+    </div>
+  </div>
+
+<!-- Page heading and form -->
+<div class="container d-flex flex-column justify-content-center align-items-center" style="min-height: 80vh;">
+  <h1 class="fw-bold mb-18">Create a New Ticket</h1>
+
+  <div class="card p-4 shadow" style="width: 600px;">
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
+
+      <div class="mb-3">
+        {{ form.asset_id.label(class="form-label") }}
+        {{ form.asset_id(class="form-control") }}
+      </div>
+
+      <div class="mb-3">
+        {{ form.category.label(class="form-label") }}
+        {{ form.category(class="form-select", id="category") }}
+      </div>
+
+      <div class="mb-3">
+        {{ form.subcategory.label(class="form-label") }}
+        {{ form.subcategory(class="form-select", id="subcategory") }}
+      </div>
+
+      <div class="mb-3">
+        {{ form.short_description.label(class="form-label") }}
+        {{ form.short_description(class="form-control") }}
+      </div>
+
+      <div class="mb-3">
+        {{ form.long_description.label(class="form-label") }}
+        {{ form.long_description(class="form-control", rows="4") }}
+      </div>
+
+      <div class="mb-3">
+        {{ form.urgency.label(class="form-label") }}
+        {{ form.urgency(class="form-select") }}
+      </div>
+
+      <div class="mb-3">
+        {{ form.severity.label(class="form-label") }}
+        {{ form.severity(class="form-select") }}
+      </div>
+
+      {{ form.submit(class="btn btn-primary w-100 mb-2") }}
+
+		<a href="{{ url_for('main.home') }}" class="btn btn-secondary w-100">Go Back to Homepage</a>
+    </form>
+  </div>
+</div>
+<!-- Subcategory JS Logic -->
+<script>
+  const subcategoryMap = {
+    "Application or Software": [
+      "Access",
+      "Password Reset",
+      "Configuration Issue",
+      "Data Issue",
+      "Defect or Error",
+      "How to Question",
+      "Installation",
+      "Performance"
+    ],
+    "End User Device": [
+      "Audio Issue",
+      "Broken Faulty Device",
+      "Capacity Issue",
+      "Configuration Issue",
+      "Defect or Error"
+    ],
+    "Network": [
+      "Access or Connectivity Issue",
+      "Data Issue",
+      "Network Drive Issue",
+      "Performance Issue"
+    ],
+    "Security & Compliance": [
+      "Compliance/Audit",
+      "Data Issue",
+      "Intrusion",
+      "New Employee On-boarding",
+      "Remote Access Issue",
+      "User Account Issue",
+      "Virus/Malware"
+    ]
+  };
+
+  const categorySelect = document.getElementById('category');
+  const subcategorySelect = document.getElementById('subcategory');
+
+  categorySelect.addEventListener('change', function () {
+    const selectedCategory = this.value;
+    const subcategories = subcategoryMap[selectedCategory] || [];
+
+    // Clear previous options
+    subcategorySelect.innerHTML = '';
+
+    // Populate new options
+    subcategories.forEach(sub => {
+      const option = document.createElement('option');
+      option.value = sub;
+      option.textContent = sub;
+      subcategorySelect.appendChild(option);
+    });
+  });
+
+  // Trigger change on load to set correct subcategories
+  window.addEventListener('load', function () {
+   // Only repopulate if subcategory is empty (e.g. on first load)
+   if (!subcategorySelect.value) {
+     categorySelect.dispatchEvent(new Event('change'));
+   }
+ });
+</script>
+{% endblock %}

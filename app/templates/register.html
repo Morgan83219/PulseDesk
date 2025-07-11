@@ -1,0 +1,146 @@
+{% extends "layout.html" %}
+{% block title %}Register Page{% endblock %}
+
+{% block content %}
+<!-- Top black bar -->
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: Arial, sans-serif;
+    }
+    .topbar {
+      background-color: #333;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-weight: bold;
+      font-size: 1.5rem;
+      color: white;
+      user-select: none;
+    }
+    .username-dropdown {
+      position: relative;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      min-width: 120px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      z-index: 1000;
+    }
+    .dropdown-content a {
+      color: black;
+      padding: 8px 12px;
+      text-decoration: none;
+      display: block;
+    }
+    .dropdown-content a:hover {
+      background-color: #ddd;
+    }
+    .username-dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .page-heading {
+      text-align: center;
+      margin: 40px 0 20px 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #333;
+    }
+    .box-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 30px;
+      max-width: 900px;
+      margin: 0 auto 60px auto;
+    }
+    .box {
+      background-color: white;
+      border: 2px solid black;
+      box-shadow: 2px 2px 6px grey;
+      width: 220px;
+      height: 140px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #333;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background-color 0.3s, box-shadow 0.3s;
+      user-select: none;
+      text-align: center;
+      text-decoration: none;
+    }
+    .box:hover {
+      background-color: #007bff;
+      color: white;
+      box-shadow: 3px 3px 10px rgba(0, 123, 255, 0.6);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="logo">Collins Aerospace</div>
+      </div>
+    </div>
+  </div>
+
+<!-- Container for heading and register box -->
+<div class="container d-flex flex-column justify-content-center align-items-center" style="min-height: 80vh;">
+  
+  <!-- Bold heading above the register card -->
+  <h1 class="fw-bold text-center" style="margin-bottom: 16px; max-width: 350px; word-wrap: break-word;">
+    Collins Aerospace PulseDesk - Register
+  </h1>
+
+  <!-- Centered registration box -->
+  <div class="card p-4 shadow" style="width: 350px;">
+    <h3 class="mb-4 text-center">Create an Account</h3>
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
+
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        {{ form.username(class="form-control", id="username", placeholder="Enter username") }}
+        {% for error in form.username.errors %}
+          <div class="text-danger small">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        {{ form.password(class="form-control", id="password", placeholder="Enter password") }}
+        {% for error in form.password.errors %}
+          <div class="text-danger small">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="mb-3">
+        <label for="confirm_password" class="form-label">Confirm Password</label>
+        {{ form.confirm_password(class="form-control", id="confirm_password", placeholder="Confirm password") }}
+        {% for error in form.confirm_password.errors %}
+          <div class="text-danger small">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      {{ form.submit(class="btn btn-primary w-100") }}
+
+      <p class="mt-3 text-center">
+        Already have an account? <a href="{{ url_for('main.login') }}">Login</a>
+      </p>
+    </form>
+  </div>
+</div>
+{% endblock %}

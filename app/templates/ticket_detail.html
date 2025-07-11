@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+{% block title %}Ticket #{{ ticket.id }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1>#{{ ticket.id }} – {{ ticket.short_description }}</h1>
+  <p><strong>Asset:</strong> {{ ticket.asset_id }} |
+     <strong>Category:</strong> {{ ticket.category }} /
+     {{ ticket.subcategory }}</p>
+  <p><strong>Urgency:</strong> {{ ticket.urgency }}, <strong>Severity:</strong> {{ ticket.severity }}</p>
+  <p><strong>State:</strong> {{ ticket.state }}</p>
+  <p><strong>Created by:</strong> {{ ticket.caller }} on {{ ticket.date_created.strftime('%Y-%m-%d %H:%M') }}</p>
+  <p><strong>Description:</strong></p>
+  <div class="mb-3">
+    <p>{{ ticket.long_description or "No detailed description provided." }}</p>
+</div>
+
+
+  <hr>
+
+  <!-- Ticket Edit Form -->
+  <form method="POST">
+    {{ edit_form.hidden_tag() }}
+
+    {% if role in ['changer', 'admin'] %}
+      <div class="mb-3">
+        {{ edit_form.asset_id.label }} {{ edit_form.asset_id(class="form-control") }}
+      </div>
+      <div class="mb-3">
+        {{ edit_form.assigned_user.label }} {{ edit_form.assigned_user(class="form-control") }}
+      </div>
+      <div class="mb-3">
+        {{ edit_form.state.label }} {{ edit_form.state(class="form-control") }}
+      </div>
+    {% endif %}
+
+    <div class="mb-3">
+      {{ edit_form.urgency.label }} {{ edit_form.urgency(class="form-control") }}
+    </div>
+    <div class="mb-3">
+      {{ edit_form.severity.label }} {{ edit_form.severity(class="form-control") }}
+    </div>
+
+    <button type="submit" name="edit_ticket" class="btn btn-primary">Update Ticket</button>
+  </form>
+
+  <hr>
+
+  <!-- Notes -->
+  <h5>Notes</h5>
+  {% for note in ticket.notes %}
+    <div class="mb-2">
+      <small><strong>{{ note.author }}</strong> on {{ note.timestamp.strftime('%Y-%m-%d %H:%M') }}:</small>
+      <p>{{ note.content }}</p>
+    </div>
+  {% else %}
+    <p>No notes yet.</p>
+  {% endfor %}
+
+  <!-- Add Note Form -->
+  <form method="POST">
+    {{ note_form.hidden_tag() }}
+    <div class="mb-3">
+      {{ note_form.content(class="form-control", rows=3, placeholder="Add a note...") }}
+    </div>
+    <button type="submit" name="add_note" class="btn btn-secondary">Add Note</button>
+  </form>
+
+  <hr>
+
+  <a href="{{ url_for('main.ticket_system') }}" class="btn btn-link">Back to Tickets</a>
+</div>
+{% endblock %}
