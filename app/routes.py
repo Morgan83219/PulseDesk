@@ -71,7 +71,7 @@ def register():
 
 @main.route('/')
 def index():
-    return "Hello, this is the root!"
+    return redirect(url_for('main.login'))
 
 @main.route('/home')
 def home():
