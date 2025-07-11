@@ -110,14 +110,28 @@
     Welcome to the Collins Aerospace PulseDesk Dashboard!
   </div>
 
-<div class="box-container">
-  <a href="{{ url_for('main.ticket_creation') }}" class="box">Ticket Creation</a>
-  <a href="{{ url_for('main.ticket_system') }}" class="box">Ticket System</a>
-  <a href="{{ url_for('main.user_manual') }}" class="box">User Manual</a>
+  <div class="box-container">
+    <a href="{{ url_for('main.ticket_creation') }}" class="box">Ticket Creation</a>
+    <a href="{{ url_for('main.ticket_system') }}" class="box">Ticket System</a>
 
-  {% if is_admin %}
-  <a href="{{ url_for('main.user_management') }}" class="box">User Management</a>
-  {% endif %}
-</div>
+    <!-- Download User Manual -->
+    <div class="box" onclick="downloadManual()">User Manual</div>
+
+    {% if is_admin %}
+    <a href="{{ url_for('main.user_management') }}" class="box">User Management</a>
+    {% endif %}
+  </div>
+
+  <!-- JavaScript to trigger PDF download -->
+  <script>
+    function downloadManual() {
+      const link = document.createElement('a');
+      link.href = "{{ url_for('static', filename='user_manual.pdf') }}";
+      link.download = 'Collins Aerospace Pulse Desk SW.pdf.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
 </body>
 </html>
